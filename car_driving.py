@@ -1,10 +1,14 @@
 import pygame
 import sys
 from pygame.locals import *
+from math import sin, cos
+import time
 import car
-
+import track
+ 
 # set up pygame
 pygame.init()
+pygame.font.init()
 
 # set up the window
 window_height = 800
@@ -13,73 +17,52 @@ windowSurface = pygame.display.set_mode((window_width, window_height), 0, 32)
 pygame.display.set_caption("Car driving")
 
 # set up the colors
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
+black = (0, 0, 0)
+white = (255, 255, 255)
+red = (255, 0, 0)
+green = (0, 255, 0)
+blue = (0, 0, 255)
 
 # draw the white background onto the surface
-windowSurface.fill(WHITE)
+windowSurface.fill(white)
 
-#pygame.draw.rect(windowSurface,BLUE,(100, 100, 100, 50)) # {display, color, (left, top, width, height)}
-car_1 = car.Car(windowSurface, xpos=window_width/2, ypos=window_height/2, width=50, length=100, angle=2, vmax=100, acc=10, color=RED)
+track = track.Track(windowSurface, window_width, window_height, green, black, white)
 
+car_1 = car.Car(windowSurface,
+                track,
+                xpos=int(7.5/100 * window_width),
+                ypos=int(55/100 * window_height),
+                width=20,
+                length=40,
+                angle=0,
+                vmax=0.25,
+                acc=0.00025,
+                color=red)
 
-
-
+clock = pygame.time.Clock()
+time_start = time.time()
+lap_time = ""
 
 # run the game loop
 while True:
-    windowSurface.fill(WHITE)
-    car_1.draw()
-    
-    # draw thge window onto the screen
     pygame.display.update()
+    current_time = str(time.time() - time_start)[:4]
+    dt = clock.tick(60)
+    windowSurface.fill(white)
+    track.draw(current_time, lap_time)
+    car_1.update(dt)
+    car_1.draw()
+    car_1.check_crash(track)
+    car_1.check_checkpoint()
+    if car_1.finish:
+        lap_time = current_time
+        time_start = time.time()
+        car_1.finish = False
+    
     for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                car_1.angle += -0.1
-                print("anlge1")
-            #car_1.draw()
-            #pygame.display.update()
-            if event.key == pygame.K_RIGHT:
-                car_1.angle += +0.1
-                print("anlge2")
-            #car_1.draw()
-            #pygame.display.update()
+        car_1.controls(event)
+        
         if event.type == QUIT:
             print("quit")
             pygame.quit()
             sys.exit()
-
-
-"""
-# set up the fonts
-basicFont = pygame.font.SysFont(None, 48)
-
-# set up the text
-text = basicFont.render("Hello world!", True, WHITE, BLUE)
-textRect = text.get_rect()
-textRect.centerx = windowSurface.get_rect().centerx
-textRect.centery = windowSurface.get_rect().centery
-
-# draw the white background onto the surface
-windowSurface.fill(WHITE)
-
-# draw a green polygon onto the surface
-pygame.draw.polygon(windowSurface, GREEN, ((146, 0), (291, 106),  (236, 277), (56, 277), (0, 106)))
-
-# draw some blue lines onto the surface
-pygame.draw.line(windowSurface, BLUE, (60, 60), (120, 60), 4)
-pygame.draw.line(windowSurface, BLUE, (120, 60), (60, 120), 4)
-pygame.draw.line(windowSurface, BLUE, (60, 120), (120, 120), 4)
-
-# get a pixel array of the surface
-pixArray = pygame.PixelArray(windowSurface)
-pixArray[480][380] = BLACK
-del pixArray
-
-# draw the text onto the surface
-#windowSurface.blit(text, textRect)
-"""
