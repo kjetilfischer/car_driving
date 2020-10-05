@@ -46,12 +46,13 @@ lap_time = ""
 # run the game loop
 while True:
     pygame.display.update()
-    current_time = str(time.time() - time_start)[:4]
+    current_time = f"{time.time() - time_start:.2f}"
     dt = clock.tick(60)
     windowSurface.fill(white)
     track.draw(current_time, lap_time)
     car_1.update(dt)
     car_1.draw()
+    car_1.sensor(track, tracer_length=200, color=black, show=True)
     car_1.check_crash(track)
     car_1.check_checkpoint()
     if car_1.finish:

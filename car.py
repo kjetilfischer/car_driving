@@ -1,6 +1,7 @@
 import pygame
-from math import sin, cos
+from math import sin, cos, sqrt
 import matplotlib.path as pltPath
+import numpy as np
 
 class Car:
     def __init__(self, surface, track, xpos, ypos, width=50, length=100, angle=0, vmax=100, acc=10, color=(255, 0, 0)):
@@ -79,7 +80,6 @@ class Car:
         
         self.points = [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
         pygame.draw.polygon(self.surface, self.color, self.points)
-        #pygame.draw.polygon(self.surface, self.color, [(10, 10), (20, 80), (10, 300), (400, 50)])
 
     
     def update(self, dt):
@@ -155,5 +155,162 @@ class Car:
             self.velo = 0
     
     
-    def sensor(self):
-        pass
+    def sensor(self, track, tracer_length=200, color=(0,0,0) , show=False):
+        self.center = np.array((self.xpos, self.ypos))
+        self.tracer0 = tracer_length * ((np.array(self.points[0]) + np.array(self.points[1]))/2 - self.center) / (self.length/2)               # forward
+        self.tracer1 = tracer_length * (np.array(self.points[0]) - self.center) / sqrt(self.width*self.width + self.length*self.length) * 2    # forward/left
+        self.tracer2 = tracer_length * (np.array(self.points[1]) - self.center) / sqrt(self.width*self.width + self.length*self.length) * 2    # forwards/right
+        self.tracer3 = tracer_length * (np.array(self.points[2]) - self.center) / sqrt(self.width*self.width + self.length*self.length) * 2    # backwards/right
+        self.tracer4 = tracer_length * (np.array(self.points[3]) - self.center) / sqrt(self.width*self.width + self.length*self.length) * 2    # backwards/left
+        self.tracer5 = tracer_length * ((np.array(self.points[2]) + np.array(self.points[3]))/2 - self.center) / (self.length/2)               # backwards
+        
+        
+        
+        # measure distance to impassables; NEEDS TO BE REVISED: TOO SLOW!!! + include outer edges
+        # contact_tracers are the intersections of tracers with impassables / distance from the center of the vehicle to impassables
+        i = 1
+        while i <= tracer_length:
+            if self.path1.contains_point((i/tracer_length * self.tracer0 + self.center).astype(int)):
+                contact_tracer0 = i/tracer_length * self.tracer0 + self.center
+                break
+            elif self.path2.contains_point((i/tracer_length * self.tracer0 + self.center).astype(int)):
+                contact_tracer0 = i/tracer_length * self.tracer0 + self.center
+                break
+            elif self.path3.contains_point((i/tracer_length * self.tracer0 + self.center).astype(int)):
+                contact_tracer0 = i/tracer_length * self.tracer0 + self.center
+                break
+            elif self.path4.contains_point((i/tracer_length * self.tracer0 + self.center).astype(int)):
+                contact_tracer0 = i/tracer_length * self.tracer0 + self.center
+                break
+            elif self.path5.contains_point((i/tracer_length * self.tracer0 + self.center).astype(int)):
+                contact_tracer0 = i/tracer_length * self.tracer0 + self.center
+                break
+            else:
+                contact_tracer0 = None
+            i += 1
+        
+        i = 1
+        while i <= tracer_length:
+            if self.path1.contains_point((i/tracer_length * self.tracer1 + self.center).astype(int)):
+                contact_tracer1 = i/tracer_length * self.tracer1 + self.center
+                break
+            elif self.path2.contains_point((i/tracer_length * self.tracer1 + self.center).astype(int)):
+                contact_tracer1 = i/tracer_length * self.tracer1 + self.center
+                break
+            elif self.path3.contains_point((i/tracer_length * self.tracer1 + self.center).astype(int)):
+                contact_tracer1 = i/tracer_length * self.tracer1 + self.center
+                break
+            elif self.path4.contains_point((i/tracer_length * self.tracer1 + self.center).astype(int)):
+                contact_tracer1 = i/tracer_length * self.tracer1 + self.center
+                break
+            elif self.path5.contains_point((i/tracer_length * self.tracer1 + self.center).astype(int)):
+                contact_tracer1 = i/tracer_length * self.tracer1 + self.center
+                break
+            else:
+                contact_tracer1 = None
+            i += 1
+        
+        i = 1
+        while i <= tracer_length:
+            if self.path1.contains_point((i/tracer_length * self.tracer2 + self.center).astype(int)):
+                contact_tracer2 = i/tracer_length * self.tracer2 + self.center
+                break
+            elif self.path2.contains_point((i/tracer_length * self.tracer2 + self.center).astype(int)):
+                contact_tracer2 = i/tracer_length * self.tracer2 + self.center
+                break
+            elif self.path3.contains_point((i/tracer_length * self.tracer2 + self.center).astype(int)):
+                contact_tracer2 = i/tracer_length * self.tracer2 + self.center
+                break
+            elif self.path4.contains_point((i/tracer_length * self.tracer2 + self.center).astype(int)):
+                contact_tracer2 = i/tracer_length * self.tracer2 + self.center
+                break
+            elif self.path5.contains_point((i/tracer_length * self.tracer2 + self.center).astype(int)):
+                contact_tracer2 = i/tracer_length * self.tracer2 + self.center
+                break
+            else:
+                contact_tracer2 = None
+            i += 1
+        
+        i = 1
+        while i <= tracer_length:
+            if self.path1.contains_point((i/tracer_length * self.tracer3 + self.center).astype(int)):
+                contact_tracer3 = i/tracer_length * self.tracer3 + self.center
+                break
+            elif self.path2.contains_point((i/tracer_length * self.tracer3 + self.center).astype(int)):
+                contact_tracer3 = i/tracer_length * self.tracer3 + self.center
+                break
+            elif self.path3.contains_point((i/tracer_length * self.tracer3 + self.center).astype(int)):
+                contact_tracer3 = i/tracer_length * self.tracer3 + self.center
+                break
+            elif self.path4.contains_point((i/tracer_length * self.tracer3 + self.center).astype(int)):
+                contact_tracer3 = i/tracer_length * self.tracer3 + self.center
+                break
+            elif self.path5.contains_point((i/tracer_length * self.tracer3 + self.center).astype(int)):
+                contact_tracer3 = i/tracer_length * self.tracer3 + self.center
+                break
+            else:
+                contact_tracer3 = None
+            i += 1
+        
+        i = 1
+        while i <= tracer_length:
+            if self.path1.contains_point((i/tracer_length * self.tracer4 + self.center).astype(int)):
+                contact_tracer4 = i/tracer_length * self.tracer4 + self.center
+                break
+            elif self.path2.contains_point((i/tracer_length * self.tracer4 + self.center).astype(int)):
+                contact_tracer4 = i/tracer_length * self.tracer4 + self.center
+                break
+            elif self.path3.contains_point((i/tracer_length * self.tracer4 + self.center).astype(int)):
+                contact_tracer4 = i/tracer_length * self.tracer4 + self.center
+                break
+            elif self.path4.contains_point((i/tracer_length * self.tracer4 + self.center).astype(int)):
+                contact_tracer4 = i/tracer_length * self.tracer4 + self.center
+                break
+            elif self.path5.contains_point((i/tracer_length * self.tracer4 + self.center).astype(int)):
+                contact_tracer4 = i/tracer_length * self.tracer4 + self.center
+                break
+            else:
+                contact_tracer4 = None
+            i += 1
+        
+        i = 1
+        while i <= tracer_length:
+            if self.path1.contains_point((i/tracer_length * self.tracer5 + self.center).astype(int)):
+                contact_tracer5 = i/tracer_length * self.tracer5 + self.center
+                break
+            elif self.path2.contains_point((i/tracer_length * self.tracer5 + self.center).astype(int)):
+                contact_tracer5 = i/tracer_length * self.tracer5 + self.center
+                break
+            elif self.path3.contains_point((i/tracer_length * self.tracer5 + self.center).astype(int)):
+                contact_tracer5 = i/tracer_length * self.tracer5 + self.center
+                break
+            elif self.path4.contains_point((i/tracer_length * self.tracer5 + self.center).astype(int)):
+                contact_tracer5 = i/tracer_length * self.tracer5 + self.center
+                break
+            elif self.path5.contains_point((i/tracer_length * self.tracer5 + self.center).astype(int)):
+                contact_tracer5 = i/tracer_length * self.tracer5 + self.center
+                break
+            else:
+                contact_tracer5 = None
+            i += 1
+        
+        if show:
+            pygame.draw.line(self.surface, color, self.center, self.center + self.tracer0)
+            pygame.draw.line(self.surface, color, self.center, self.center + self.tracer1)                                  # why is np.array(self.points[0])*4 as last argument is not possible???
+            pygame.draw.line(self.surface, color, self.center, self.center + self.tracer2)
+            pygame.draw.line(self.surface, color, self.center, self.center + self.tracer3)
+            pygame.draw.line(self.surface, color, self.center, self.center + self.tracer4)
+            pygame.draw.line(self.surface, color, self.center, self.center + self.tracer5)
+            if contact_tracer0 is not None:
+                pygame.draw.circle(self.surface, color, (contact_tracer0).astype(int), 4)
+            if contact_tracer1 is not None:
+                pygame.draw.circle(self.surface, color, (contact_tracer1).astype(int), 4)
+            if contact_tracer2 is not None:
+                pygame.draw.circle(self.surface, color, (contact_tracer2).astype(int), 4)
+            if contact_tracer3 is not None:
+                pygame.draw.circle(self.surface, color, (contact_tracer3).astype(int), 4)
+            if contact_tracer4 is not None:
+                pygame.draw.circle(self.surface, color, (contact_tracer4).astype(int), 4)
+            if contact_tracer5 is not None:
+                pygame.draw.circle(self.surface, color, (contact_tracer5).astype(int), 4)
+        
