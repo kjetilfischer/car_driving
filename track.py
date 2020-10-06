@@ -1,4 +1,5 @@
 import pygame
+import numpy as np
 
 class Track:
     def __init__(self, surface, window_width, window_height, color1, color2, color3):
@@ -82,6 +83,38 @@ class Track:
         self.myfont = pygame.font.SysFont("Comic Sans MS", 12)
         self.myfont2 = pygame.font.SysFont("Comic Sans MS", 24)
         self.text = self.myfont.render("START/FINISH", False, self.color3)
+        
+        
+        self.impassable_lines = [[self.s1[0], np.array(self.s1[1]) - np.array(self.s1[0])],
+                                [self.s1[1], np.array(self.s1[2]) - np.array(self.s1[1])],
+                                [self.s1[2], np.array(self.s1[3]) - np.array(self.s1[2])],
+                                [self.s1[3], np.array(self.s1[0]) - np.array(self.s1[3])],
+                            
+                                [self.s2[0], np.array(self.s2[1]) - np.array(self.s2[0])],
+                                [self.s2[1], np.array(self.s2[2]) - np.array(self.s2[1])],
+                                [self.s2[2], np.array(self.s2[3]) - np.array(self.s2[2])],
+                                [self.s2[3], np.array(self.s2[0]) - np.array(self.s2[3])],
+                            
+                                [self.s3[0], np.array(self.s3[1]) - np.array(self.s3[0])],
+                                [self.s3[1], np.array(self.s3[2]) - np.array(self.s3[1])],
+                                [self.s3[2], np.array(self.s3[3]) - np.array(self.s3[2])],
+                                [self.s3[3], np.array(self.s3[0]) - np.array(self.s3[3])],
+                            
+                                [self.s4[0], np.array(self.s4[1]) - np.array(self.s4[0])],
+                                [self.s4[1], np.array(self.s4[2]) - np.array(self.s4[1])],
+                                [self.s4[2], np.array(self.s4[3]) - np.array(self.s4[2])],
+                                [self.s4[3], np.array(self.s4[0]) - np.array(self.s4[3])],
+                            
+                                [self.s5[0], np.array(self.s5[1]) - np.array(self.s5[0])],
+                                [self.s5[1], np.array(self.s5[2]) - np.array(self.s5[1])],
+                                [self.s5[2], np.array(self.s5[3]) - np.array(self.s5[2])],
+                                [self.s5[3], np.array(self.s5[0]) - np.array(self.s5[3])],
+                            
+                                [(0,0), (0,self.height)],
+                                [(0,self.height), np.array((self.width, self.height))-np.array(((0,self.height)))],
+                                [(0,0), (self.width,0)],
+                                [(self.width,0), np.array((self.width, self.height))-np.array(((self.width,0)))]]
+        
         
         
     def draw(self, current_time, lap_time):
