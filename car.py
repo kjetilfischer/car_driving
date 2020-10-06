@@ -191,6 +191,7 @@ class Car:
     
     
     def calculate_intersection(self, L1, L2):
+        # sometimes occurring intersections are not recognized...
         p1 = L1[0]  # position vector
         p2 = L1[1]  # direction vector
         p3 = L2[0]  # position vector
