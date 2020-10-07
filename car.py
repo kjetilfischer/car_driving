@@ -191,7 +191,8 @@ class Car:
     
     
     def calculate_intersection(self, L1, L2):
-        # sometimes occurring intersections are not recognized...
+        # calculates the intersection of two given lines in respect to the position vector and the length of the direction vector
+        # returns point of intersection in respect to L1
         p1 = L1[0]  # position vector
         p2 = L1[1]  # direction vector
         p3 = L2[0]  # position vector
@@ -228,19 +229,29 @@ class Car:
         self.tracers[4] = tracer_length * (np.array(self.points[3]) - self.center) / sqrt(self.width*self.width + self.length*self.length) * 2    # backwards/left
         self.tracers[5] = tracer_length * ((np.array(self.points[2]) + np.array(self.points[3]))/2 - self.center) / (self.length/2)               # backwards
       
+        # calculate intersections and determine the closest intersection per tracer
         contact_tracers = []
         for tracer in self.tracers:
-            contacts = []
+            #contacts = []
+            previous_distance = None
+            closest_intersection = None
             for line in track.impassable_lines:
-                contact = self.calculate_intersection((self.center, tracer), line)
-                if contact is not None:
-                    contacts.append(contact)
-            try:
-                contact_tracers.append(np.array(min(contacts)))
-            except:
+                intersection = self.calculate_intersection((self.center, tracer), line)
+                if intersection is not None and previous_distance is None:
+                    distance = np.linalg.norm(intersection - self.center)                   # intersections - self.center, since we are interested in the distance between the car and the intersection and not the origin and the intersection
+                    previous_distance = distance
+                    closest_intersection = intersection
+                elif intersection is not None and previous_distance is not None:
+                    distance = np.linalg.norm(intersection - self.center)
+                    if distance < previous_distance:
+                        previous_distance = distance
+                        closest_intersection = intersection
+                #contacts.append(closest_intersection) 
+            if closest_intersection is not None:
+                contact_tracers.append(np.array(closest_intersection))
+            else:
                 contact_tracers.append(None)
-
-        
+ 
         if show:
             for tracer in self.tracers:
                 pygame.draw.line(self.surface, color, self.center, self.center + tracer)
