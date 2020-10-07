@@ -63,6 +63,21 @@ while True:
     for event in pygame.event.get():
         car_1.controls(event)
         
+        if event.type == pygame.KEYDOWN:
+            if event.key == K_ESCAPE:
+                car_1 = car.Car(windowSurface,
+                                track,
+                                xpos=int(7.5/100 * window_width),
+                                ypos=int(55/100 * window_height),
+                                width=20,
+                                length=40,
+                                angle=0,
+                                vmax=0.25,
+                                acc=0.00025,
+                                color=red)
+                time_start = time.time()
+                lap_time = ""
+                
         if event.type == QUIT:
             print("quit")
             pygame.quit()
