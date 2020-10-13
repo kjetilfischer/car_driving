@@ -4,7 +4,22 @@ import matplotlib.path as pltPath
 import numpy as np
 
 class Car:
-    def __init__(self, surface, track, xpos, ypos, width=50, length=100, angle=0, vmax=100, acc=10, color=(255, 0, 0)):
+    def __init__(self,
+                surface,
+                track,
+                xpos,
+                ypos,
+                width=50,
+                length=100,
+                angle=0,
+                vmax=100,
+                acc=10,
+                color=(255, 0, 0),
+                left="K_LEFT",
+                right="K_RIGHT",
+                up="K_UP",
+                down="K_DOWN",
+                brake="K_SPACE"):
         # static properties
         self.width = width
         self.length = length
@@ -12,6 +27,12 @@ class Car:
         self.acc = acc
         self.color = color
         self.surface = surface
+        # control keys
+        self.kleft = getattr(pygame, left)
+        self.kright = getattr(pygame, right)
+        self.kup = getattr(pygame, up)
+        self.kdown = getattr(pygame, down)
+        self.kbrake = getattr(pygame, brake)
         
         # variable properties
         self.angle = angle
@@ -38,30 +59,29 @@ class Car:
         self.checkpoint = False
         self.finish = False
     
-    
     def controls(self, event):
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
+            if event.key == self.kleft:
                 self.turn_left = True
-            if event.key == pygame.K_RIGHT:
+            if event.key == self.kright:
                 self.turn_right = True
-            if event.key == pygame.K_UP:
+            if event.key == self.kup:
                 self.accelerate = True
-            if event.key == pygame.K_DOWN:
+            if event.key == self.kdown:
                 self.decelerate = True
-            if event.key == pygame.K_SPACE:
+            if event.key == self.kbrake:
                 self.brake = True
         
         if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT:
+            if event.key == self.kleft:
                 self.turn_left = False
-            if event.key == pygame.K_RIGHT:
+            if event.key == self.kright:
                 self.turn_right = False
-            if event.key == pygame.K_UP:
+            if event.key == self.kup:
                 self.accelerate = False
-            if event.key == pygame.K_DOWN:
+            if event.key == self.kdown:
                 self.decelerate = False
-            if event.key == pygame.K_SPACE:
+            if event.key == self.kbrake:
                 self.brake = False
 
     
