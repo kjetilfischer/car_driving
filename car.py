@@ -74,8 +74,8 @@ class Car:
                 self.accelerate = True
             if event.key == self.kdown:
                 self.decelerate = True
-            if event.key == self.kbrake:
-                self.brake = True
+            #if event.key == self.kbrake:
+            #    self.brake = True
         
         if event.type == pygame.KEYUP:
             if event.key == self.kleft:
@@ -86,8 +86,8 @@ class Car:
                 self.accelerate = False
             if event.key == self.kdown:
                 self.decelerate = False
-            if event.key == self.kbrake:
-                self.brake = False
+            #if event.key == self.kbrake:
+            #    self.brake = False
 
     
     def draw(self):
