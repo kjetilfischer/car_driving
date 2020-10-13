@@ -25,7 +25,7 @@ class Car:
         # static properties
         self.width = width
         self.length = length
-        self.vmax = vmax
+        self.vmax_static = vmax
         self.acc = acc
         self.color = color
         self.surface = surface
@@ -38,6 +38,7 @@ class Car:
         self.kbrake = getattr(pygame, brake)
         
         # variable properties
+        self.vmax = self.vmax_static
         self.angle = angle
         self.old_angles = [0]
         self.drift_counter = 0
@@ -110,6 +111,8 @@ class Car:
     
     def update(self, dt):
         # driving physics; update variable properties
+        if self.velo > self.vmax:
+            self.velo = self.vmax
         if self.turn_left:
             self.angle -= 0.01 * self.velo * dt
         if self.turn_right:
@@ -190,7 +193,9 @@ class Car:
             if crash:
                 break
         if crash:
-            self.velo = 0
+            self.vmax = self.vmax_static/10
+        else:
+            self.vmax = self.vmax_static
 
     
     def calculate_intersection(self, L1, L2):
