@@ -15,11 +15,13 @@ class Car:
                 vmax=100,
                 acc=10,
                 color=(255, 0, 0),
+                drift_factor=30, # minimum is 1
                 left="K_LEFT",
                 right="K_RIGHT",
                 up="K_UP",
                 down="K_DOWN",
                 brake="K_SPACE"):
+        
         # static properties
         self.width = width
         self.length = length
@@ -27,6 +29,7 @@ class Car:
         self.acc = acc
         self.color = color
         self.surface = surface
+        self.drift_factor = drift_factor
         # control keys
         self.kleft = getattr(pygame, left)
         self.kright = getattr(pygame, right)
@@ -36,6 +39,8 @@ class Car:
         
         # variable properties
         self.angle = angle
+        self.old_angles = [0]
+        self.drift_counter = 0
         self.xpos = xpos
         self.ypos = ypos
         self.velo = 0.
@@ -86,6 +91,7 @@ class Car:
 
     
     def draw(self):
+        # Drehmatrix
         x1 = self.xpos - self.width/2*cos(self.angle) + self.length/2*sin(self.angle)
         y1 = self.ypos - self.width/2*sin(self.angle) - self.length/2*cos(self.angle)
         
@@ -128,9 +134,21 @@ class Car:
                 self.velo += self.acc/3 * dt
             if self.velo > -0.01 and self.velo < 0.01:
                 self.velo = 0
+        
+        self.old_angles.append(self.angle)
+        if len(self.old_angles) > self.drift_factor:
+            self.old_angles = self.old_angles[-self.drift_factor:]
+        
         if self.velo != 0:
-            self.xpos = self.xpos + (dt* self.velo * sin(self.angle))
-            self.ypos = self.ypos - (dt* self.velo * cos(self.angle))
+            sumx = 0
+            sumy = 0
+            for angle in self.old_angles:
+                sumx += dt* self.velo * sin(angle)
+                sumy += dt* self.velo * cos(angle)
+            self.xpos = self.xpos + (sumx/self.drift_factor)
+            self.ypos = self.ypos - (sumy/self.drift_factor)
+            #self.xpos = self.xpos + (dt* self.velo * sin(self.angle))
+            #self.ypos = self.ypos - (dt* self.velo * cos(self.angle))
     
     
     def check_checkpoint(self):
