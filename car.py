@@ -238,8 +238,25 @@ class Car:
                 pygame.draw.circle(self.surface, color, self.contact_tracers[5].astype(int), 4)
     
     
-    def autonomous_driving(self):
+    def autonomous_driving(self, parameter_sets):
         # include after sensor()
-        pass
+        # decision criteria:
+        #   self.tracer_distances
+        #   self.velo
+        #   track.impassable_lines ?
+        # possibilities of action:
+        #   press keys: up, left, down, right, space
+        # fitness model criteria:
+        #   lap_time
+        #   checkpoints (maybe)
         
-
+        self.car_states = [self.turn_left, self.turn_right, self.accelerate, self.decelerate, self.brake] # add no_turn for both other turns to be false
+        threshold = 1
+        for state in car_states:
+            for parameter_set in parameter_sets:
+                evaluation = parameters[0] * self.tracer_distances[0] + parameters[1] * self.tracer_distances[1] + parameters[2] * self.tracer_distances[2] + parameters[3] * self.tracer_distances[3] + parameters[4] * self.tracer_distances[4] + parameters[5] * self.tracer_distances[5] + parameters[6] * self.velo
+                if evaluation < threshold:
+                    state = True
+                else:
+                    state = False
+        # [[1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1]]
