@@ -30,6 +30,9 @@ class Car:
         self.color = color
         self.surface = surface
         self.drift_factor = drift_factor
+        self.xpos_start = xpos
+        self.ypos_start = ypos
+        self.angle_start = angle
         # control keys
         self.kleft = getattr(pygame, left)
         self.kright = getattr(pygame, right)
@@ -39,11 +42,11 @@ class Car:
         
         # variable properties
         self.vmax = self.vmax_static
-        self.angle = angle
+        self.angle = self.angle_start
         self.old_angles = [0]
         self.drift_counter = 0
-        self.xpos = xpos
-        self.ypos = ypos
+        self.xpos = self.xpos_start
+        self.ypos = self.ypos_start
         self.velo = 0.
         
         # path for intersection check`s
@@ -64,6 +67,15 @@ class Car:
         
         self.checkpoint = False
         self.finish = False
+    
+    def reset(self):
+        self.vmax = self.vmax_static
+        self.angle = self.angle_start
+        self.old_angles = [0]
+        self.drift_counter = 0
+        self.xpos = self.xpos_start
+        self.ypos = self.ypos_start
+        self.velo = 0.
     
     def controls(self, event):
         if event.type == pygame.KEYDOWN:
@@ -176,26 +188,58 @@ class Car:
         for point in self.points:
             if point[0] < 0 or point[0] > track.width:
                 crash = True
+                crash_bounds = True
             elif point[1] < 0 or point[1] > track.height:
                 crash = True
+                crash_bounds = True
             elif self.path1.contains_point(point):
                 crash = True
+                crash_bounds = False
             elif self.path2.contains_point(point):
                 crash = True
+                crash_bounds = False
             elif self.path3.contains_point(point):
                 crash = True
+                crash_bounds = False
             elif self.path4.contains_point(point):
                 crash = True
+                crash_bounds = False
             elif self.path5.contains_point(point):
                 crash = True
+                crash_bounds = False
             else:
                 crash = False
+                crash_bounds = False
             if crash:
                 break
         if crash:
             self.vmax = self.vmax_static/10
         else:
             self.vmax = self.vmax_static
+        if crash_bounds:
+            out_of_bounds_x_left = []
+            out_of_bounds_x_right = []
+            out_of_bounds_y_top = []
+            out_of_bounds_y_bot = []
+            for point in self.points:
+                if point[0] < 0:
+                    out_of_bounds_x_left.append(True)
+                else:
+                    out_of_bounds_x_left.append(False)
+                if point[0] > track.width:
+                    out_of_bounds_x_right.append(True)
+                else:
+                    out_of_bounds_x_right.append(False)
+                if point[1] < 0:
+                    out_of_bounds_y_top.append(True)
+                else:
+                    out_of_bounds_y_top.append(False)
+                if point[1] > track.height:
+                    out_of_bounds_y_bot.append(True)
+                else:
+                    out_of_bounds_y_bot.append(False)
+            if all(out_of_bounds_x_left) or all(out_of_bounds_x_right) or all(out_of_bounds_y_top) or all(out_of_bounds_y_bot):
+                self.reset()
 
     
     def calculate_intersection(self, L1, L2):

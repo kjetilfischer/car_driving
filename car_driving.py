@@ -92,36 +92,8 @@ while True:
         
         if event.type == pygame.KEYDOWN:
             if event.key == K_ESCAPE:
-                car_1 = car.Car(windowSurface,
-                                track,
-                                xpos=int(3/100 * window_width),
-                                ypos=int(55/100 * window_height),
-                                width=20,
-                                length=40,
-                                angle=0,
-                                vmax=0.25,
-                                acc=0.00025,
-                                color=red,
-                                drift_factor=30,
-                                left="K_a",
-                                right="K_d",
-                                up="K_w",
-                                down="K_s")
-                car_2 = car.Car(windowSurface,
-                                track,
-                                xpos=int(7/100 * window_width),
-                                ypos=int(55/100 * window_height),
-                                width=20,
-                                length=40,
-                                angle=0,
-                                vmax=0.25,
-                                acc=0.00025,
-                                color=blue,
-                                drift_factor=30,
-                                left="K_LEFT",
-                                right="K_RIGHT",
-                                up="K_UP",
-                                down="K_DOWN")
+                car_1.reset()
+                car_2.reset()
                 time_start = time.time()
                 lap_time = ""
                 
