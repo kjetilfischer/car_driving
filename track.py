@@ -117,7 +117,7 @@ class Track:
         
         
         
-    def draw(self, current_time, lap_time):
+    def draw(self, current_time1, current_time2, lap_time1, lap_time2):
         pygame.draw.polygon(self.surface, self.color1, self.s1)
         pygame.draw.polygon(self.surface, self.color1, self.s2)
         pygame.draw.polygon(self.surface, self.color1, self.s3)
@@ -127,9 +127,13 @@ class Track:
         pygame.draw.polygon(self.surface, self.color3, self.checkpoint)
         self.surface.blit(self.text, (int(2/100 * self.width), int(49/100 * self.height)))
         
-        self.current_time = self.myfont2.render(current_time, False, self.color2)
-        self.surface.blit(self.current_time, (5,5))
-        self.lap_time = self.myfont2.render("Your lap time: " + lap_time, False, self.color2)
-        self.surface.blit(self.lap_time, (5, 30))
+        self.current_time1 = self.myfont2.render(current_time1, False, self.color2)
+        self.current_time2 = self.myfont2.render(current_time2, False, self.color2)
+        self.surface.blit(self.current_time1, (5,5))
+        self.surface.blit(self.current_time2, (750,5))
+        self.lap_time1 = self.myfont2.render("Red's lap time: " + lap_time1, False, self.color2)
+        self.lap_time2 = self.myfont2.render("Blue's lap time: " + lap_time2, False, self.color2)
+        self.surface.blit(self.lap_time1, (5, 30))
+        self.surface.blit(self.lap_time2, (750, 30))
         
         

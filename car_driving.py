@@ -61,16 +61,19 @@ car_2 = car.Car(windowSurface,
                 down="K_DOWN")
 
 clock = pygame.time.Clock()
-time_start = time.time()
-lap_time = ""
+time_start1 = time.time()
+time_start2 = time_start1
+lap_time1 = ""
+lap_time2 = ""
 
 # run the game loop
 while True:
     pygame.display.update()
-    current_time = f"{time.time() - time_start:.2f}"
+    current_time1 = f"{time.time() - time_start1:.2f}"
+    current_time2 = f"{time.time() - time_start2:.2f}"
     dt = clock.tick(60)
     windowSurface.fill(white)
-    track.draw(current_time, lap_time)
+    track.draw(current_time1, current_time2, lap_time1, lap_time2)
     car_1.update(dt)
     car_2.update(dt)
     car_1.draw()
@@ -82,9 +85,13 @@ while True:
     car_1.check_checkpoint()
     car_2.check_checkpoint()
     if car_1.finish:
-        lap_time = current_time
-        time_start = time.time()
+        lap_time1 = current_time1
+        time_start1 = time.time()
         car_1.finish = False
+    if car_2.finish:
+        lap_time2 = current_time2
+        time_start2 = time.time()
+        car_2.finish = False
     
     for event in pygame.event.get():
         car_1.controls(event)
@@ -95,7 +102,8 @@ while True:
                 car_1.reset()
                 car_2.reset()
                 time_start = time.time()
-                lap_time = ""
+                lap_time1 = ""
+                lap_time2 = ""
                 
         if event.type == QUIT:
             print("quit")
