@@ -14,6 +14,8 @@ class Car:
                 angle=0,
                 vmax=100,
                 acc=10,
+                #fric=5, # friction is interpreted as maximum centripetal acceleration (not yet)
+                #r_turn=2, # radius of the driven circle when turning
                 color=(255, 0, 0),
                 drift_factor=30, # minimum is 1
                 left="K_LEFT",
@@ -59,6 +61,7 @@ class Car:
         self.pathsf = pltPath.Path(track.start_finish)
         self.pathcp = pltPath.Path(track.checkpoint)
         
+        # states of the car
         self.turn_left = False
         self.turn_right = False
         self.accelerate = False
@@ -150,6 +153,7 @@ class Car:
             if self.velo > -0.01 and self.velo < 0.01:
                 self.velo = 0
         
+        # drift physics
         self.old_angles.append(self.angle)
         if len(self.old_angles) > self.drift_factor:
             self.old_angles = self.old_angles[-self.drift_factor:]
@@ -164,7 +168,7 @@ class Car:
             self.ypos = self.ypos - (sumy/self.drift_factor)
             #self.xpos = self.xpos + (dt* self.velo * sin(self.angle))
             #self.ypos = self.ypos - (dt* self.velo * cos(self.angle))
-    
+        
     
     def check_checkpoint(self):
         # checkpoint
