@@ -6,3 +6,7 @@ __pycache__/
 
 # test files
 test.py
+
+# track files
+*.png
+*.jpg

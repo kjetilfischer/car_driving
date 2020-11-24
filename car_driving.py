@@ -30,15 +30,16 @@ track = track.Track(windowSurface, window_width, window_height, green, black, wh
 
 car_1 = car.Car(windowSurface,
                 track,
-                xpos=int(3/100 * window_width),
-                ypos=int(55/100 * window_height),
+                xpos=track.startp1[0],
+                ypos=track.startp1[1],
                 width=20,
                 length=40,
                 angle=0,
                 vmax=0.25,
                 acc=0.00025,
+                carmodel="redcar.png",
                 color=red,
-                drift_factor=20,
+                drift_factor=1,
                 left="K_a",
                 right="K_d",
                 up="K_w",
@@ -46,15 +47,16 @@ car_1 = car.Car(windowSurface,
 
 car_2 = car.Car(windowSurface,
                 track,
-                xpos=int(7/100 * window_width),
-                ypos=int(55/100 * window_height),
+                xpos=track.startp2[0],
+                ypos=track.startp2[1],
                 width=20,
                 length=40,
                 angle=0,
                 vmax=0.25,
                 acc=0.00025,
+                carmodel="bluecar.png",
                 color=blue,
-                drift_factor=20,
+                drift_factor=1,
                 left="K_LEFT",
                 right="K_RIGHT",
                 up="K_UP",
@@ -78,10 +80,10 @@ while True:
     car_2.update(dt)
     car_1.draw()
     car_2.draw()
-    car_1.sensor(track, tracer_length=600, color=black, show=False)
-    car_2.sensor(track, tracer_length=600, color=black, show=False)
-    car_1.check_crash(track)
-    car_2.check_crash(track)
+    #car_1.sensor(track, tracer_length=600, color=black, show=False)
+    #car_2.sensor(track, tracer_length=600, color=black, show=False)
+    car_1.check_crash(track, dt)
+    car_2.check_crash(track, dt)
     car_1.check_checkpoint()
     car_2.check_checkpoint()
     if car_1.finish:

@@ -3,7 +3,7 @@ from math import sin, cos, sqrt
 import matplotlib.path as pltPath
 import numpy as np
 
-class Car:
+class Car():
     def __init__(self,
                 surface,
                 track,
@@ -14,6 +14,7 @@ class Car:
                 angle=0,
                 vmax=100,
                 acc=10,
+                carmodel=None,
                 #fric=5, # friction is interpreted as maximum centripetal acceleration (not yet)
                 #r_turn=2, # radius of the driven circle when turning
                 color=(255, 0, 0),
@@ -35,6 +36,7 @@ class Car:
         self.xpos_start = xpos
         self.ypos_start = ypos
         self.angle_start = angle
+        self.track = track
         # control keys
         self.kleft = getattr(pygame, left)
         self.kright = getattr(pygame, right)
@@ -51,15 +53,25 @@ class Car:
         self.ypos = self.ypos_start
         self.velo = 0.
         
+        # load car model
+        #if carmodel is not None:                                                                   # not working yet
+        #    self.carmodel = pygame.image.load(carmodel)
+        #    self.carmodel = pygame.transform.scale(self.carmodel, (self.width, self.length))
+        #    self.carmodel = pygame.transform.rotate(self.carmodel, self.angle)
+        
         # path for intersection check`s
+        """
         self.path1 = pltPath.Path(track.s1)
         self.path2 = pltPath.Path(track.s2)
         self.path3 = pltPath.Path(track.s3)
         self.path4 = pltPath.Path(track.s4)
         self.path5 = pltPath.Path(track.s5)
+        """
         
+        """
         self.pathsf = pltPath.Path(track.start_finish)
         self.pathcp = pltPath.Path(track.checkpoint)
+        """
         
         # states of the car
         self.turn_left = False
@@ -79,6 +91,7 @@ class Car:
         self.xpos = self.xpos_start
         self.ypos = self.ypos_start
         self.velo = 0.
+        self.checkpoint = False
     
     def controls(self, event):
         if event.type == pygame.KEYDOWN:
@@ -108,30 +121,34 @@ class Car:
     
     def draw(self):
         # Drehmatrix
-        x1 = self.xpos - self.width/2*cos(self.angle) + self.length/2*sin(self.angle)
-        y1 = self.ypos - self.width/2*sin(self.angle) - self.length/2*cos(self.angle)
+        x1 = int(self.xpos - self.width/2*cos(self.angle) + self.length/2*sin(self.angle))
+        y1 = int(self.ypos - self.width/2*sin(self.angle) - self.length/2*cos(self.angle))
         
-        x2 = self.xpos + self.width/2*cos(self.angle) + self.length/2*sin(self.angle)
-        y2 = self.ypos + self.width/2*sin(self.angle) - self.length/2*cos(self.angle)
+        x2 = int(self.xpos + self.width/2*cos(self.angle) + self.length/2*sin(self.angle))
+        y2 = int(self.ypos + self.width/2*sin(self.angle) - self.length/2*cos(self.angle))
         
-        x3 = self.xpos + self.width/2*cos(self.angle) - self.length/2*sin(self.angle)
-        y3 = self.ypos + self.width/2*sin(self.angle) + self.length/2*cos(self.angle)
+        x3 = int(self.xpos + self.width/2*cos(self.angle) - self.length/2*sin(self.angle))
+        y3 = int(self.ypos + self.width/2*sin(self.angle) + self.length/2*cos(self.angle))
         
-        x4 = self.xpos - self.width/2*cos(self.angle) - self.length/2*sin(self.angle)
-        y4 = self.ypos - self.width/2*sin(self.angle) + self.length/2*cos(self.angle)
+        x4 = int(self.xpos - self.width/2*cos(self.angle) - self.length/2*sin(self.angle))
+        y4 = int(self.ypos - self.width/2*sin(self.angle) + self.length/2*cos(self.angle))
         
         self.points = [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
         pygame.draw.polygon(self.surface, self.color, self.points)
+        #self.carmodel = pygame.transform.rotate(self.carmodel, self.angle)     # not working yet
+        #self.surface.blit(self.carmodel, (x1, y1))
 
     
     def update(self, dt):
         # driving physics; update variable properties
-        if self.velo > self.vmax:
+        if self.velo > self.vmax and self.velo > 0:
             self.velo = self.vmax
+        if self.velo < -self.vmax/2 and self.velo < 0:
+            self.velo = -self.vmax/2
         if self.turn_left:
-            self.angle -= 0.01 * self.velo * dt
+            self.angle -= (0.015 * self.velo * dt) # - (0.01 * (self.velo*self.velo/self.vmax) * dt)
         if self.turn_right:
-            self.angle += 0.01 * self.velo * dt
+            self.angle += (0.015 * self.velo * dt) # - (0.01 * (self.velo*self.velo/self.vmax) * dt)
         if self.accelerate:
             if self.velo < self.vmax:
                 self.velo += self.acc * dt
@@ -174,50 +191,59 @@ class Car:
         # checkpoint
         if not self.checkpoint:
             for point in self.points:
-                if self.pathcp.contains_point(point):
+                if point in self.track.checkpoint:
                     self.checkpoint = True
                 if self.checkpoint:
                     break
         # finish
         if self.checkpoint and not self.finish:
             for point in self.points:
-                if self.pathsf.contains_point(point):
+                if point in self.track.start_finish:
                     self.finish = True
                     self.checkpoint = False
                 if self.finish:
                     break
     
     
-    def check_crash(self, track):
+    def check_crash(self, track, dt):
         for point in self.points:
+            # check for window boundaries first
             if point[0] < 0 or point[0] > track.width:
                 crash = True
                 crash_bounds = True
             elif point[1] < 0 or point[1] > track.height:
                 crash = True
                 crash_bounds = True
-            elif self.path1.contains_point(point):
+            # check for track limits
+            elif point in track.track_limits:
                 crash = True
                 crash_bounds = False
-            elif self.path2.contains_point(point):
-                crash = True
-                crash_bounds = False
-            elif self.path3.contains_point(point):
-                crash = True
-                crash_bounds = False
-            elif self.path4.contains_point(point):
-                crash = True
-                crash_bounds = False
-            elif self.path5.contains_point(point):
-                crash = True
-                crash_bounds = False
+            
+            #elif self.path1.contains_points(self.points).any(): # no need for the for loop
+            #    crash = True
+            #    crash_bounds = False
+            #elif self.path2.contains_points(self.points).any():
+            #    crash = True
+            #    crash_bounds = False
+            #elif self.path3.contains_points(self.points).any():
+            #    crash = True
+            #    crash_bounds = False
+            #elif self.path4.contains_points(self.points).any():
+            #    crash = True
+            #    crash_bounds = False
+            #elif self.path5.contains_points(self.points).any():
+            #    crash = True
+            #    crash_bounds = False
             else:
                 crash = False
                 crash_bounds = False
             if crash:
                 break
         if crash:
-            self.vmax = self.vmax_static/10
+            self.velo = self.velo * (-1)
+            #self.vmax = self.vmax_static/10 * 0
+            #self.xpos -= dt * 1.2 *(self.velo) * sin(self.angle) #not working yet
+            #self.ypos -= dt * 1.2 *(self.velo) * cos(self.angle)
         else:
             self.vmax = self.vmax_static
         if crash_bounds:
