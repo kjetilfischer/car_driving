@@ -297,7 +297,7 @@ class Car():
                 Pxy = np.array([(x1 + (x2 * solved[0])), (y1 + (y2 * solved[0]))])
             else:
                 Pxy = None
-        except:
+        except np.linalg.LinAlgError:
             Pxy = None
         return Pxy
     

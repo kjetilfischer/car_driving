@@ -11,7 +11,7 @@ class Track:
         self.color2 = color2
         self.color3 = color3
         
-        """
+        
         s1_x1 = int(15/100 * self.width)
         s1_y1 = int(15/100 * self.height)
         s1_x2 = int(15/100 * self.width)
@@ -61,12 +61,12 @@ class Track:
         s5_x4 = int(75/100 * self.width)
         s5_y4 = int(45/100 * self.height)
         self.s5 = [(s5_x1, s5_y1), (s5_x2, s5_y2), (s5_x3, s5_y3), (s5_x4, s5_y4)]
-        """
+        
         
         # START OF TRACK ANALYSIS
 
         # read image
-        self.img = mpimg.imread("track2.png")
+        self.img = mpimg.imread("track3.png")
 
         # check for track size
         if len(self.img) != self.height or len(self.img[0]) != self.width:
@@ -133,7 +133,7 @@ class Track:
         self.myfont2 = pygame.font.SysFont("Comic Sans MS", 24)
         self.text = self.myfont.render("START/FINISH", False, self.color3)
         
-        """
+        
         self.impassable_lines = [[self.s1[0], np.array(self.s1[1]) - np.array(self.s1[0])],
                                 [self.s1[1], np.array(self.s1[2]) - np.array(self.s1[1])],
                                 [self.s1[2], np.array(self.s1[3]) - np.array(self.s1[2])],
@@ -163,7 +163,7 @@ class Track:
                                 [(0,self.height), np.array((self.width, self.height))-np.array(((0,self.height)))],
                                 [(0,0), (self.width,0)],
                                 [(self.width,0), np.array((self.width, self.height))-np.array(((self.width,0)))]]
-        """
+        
         
         
     def draw(self, current_time1, current_time2, lap_time1, lap_time2):
