@@ -32,6 +32,8 @@ class Car():
         self.acc = acc
         self.color = color
         self.surface = surface
+        if drift_factor < 1:
+            raise ValueError("drift_factor should not be smaller than one")
         self.drift_factor = drift_factor
         self.xpos_start = xpos
         self.ypos_start = ypos
