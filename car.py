@@ -295,7 +295,7 @@ class Car():
         b = np.array([x3 - x1, y3 - y1])
         try:
             solved = np.linalg.solve(a, b)
-            if solved[0] <= 1 and solved[0] > 0 and solved[1] <= 1 and solved[1] > 0:
+            if all(0 < item <= 1 for item in solved):       # if solved[0] <= 1 and solved[0] > 0 and solved[1] <= 1 and solved[1] > 0:
                 Pxy = np.array([(x1 + (x2 * solved[0])), (y1 + (y2 * solved[0]))])
             else:
                 Pxy = None
