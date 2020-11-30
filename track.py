@@ -73,13 +73,15 @@ class Track:
             raise ValueError(f"The size of the track is not {self.width}x{self.height}.")
 
         # find track limits
-        self.track_limits = []
+        #self.track_limits = []
+        self.track_limits = [[0 for x in range(self.width)] for y in range(self.height)]
         self.start_finish = []
         self.checkpoint = []
         for row in range(len(self.img)):
             for column in range(len(self.img[0])):
                 if (self.img[row][column][:3] == [0, 0, 0]).all():
-                    self.track_limits.append((column, row))
+                    #self.track_limits.append((column, row))
+                    self.track_limits[row][column] = 1
                 if (self.img[row][column][:3] == [1, 0, 0]).all():      # find markers
                     self.startp1 = (column, row)
                     self.img[row][column][0] = 1                        # hide markers

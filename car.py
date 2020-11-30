@@ -217,9 +217,14 @@ class Car():
                 crash = True
                 crash_bounds = True
             # check for track limits
-            elif point in track.track_limits:
+            #elif point in track.track_limits:
+            #    crash = True
+            #    crash_bounds = False
+            elif track.track_limits[point[1]][point[0]]:
                 crash = True
-                crash_bounds = False
+                crash_bounds = True
+            
+            
             
             #elif self.path1.contains_points(self.points).any(): # no need for the for loop
             #    crash = True
@@ -320,6 +325,7 @@ class Car():
         self.center = np.array((self.xpos, self.ypos))
         
         self.tracer_points = []
+        self.contact_tracers = []
         
             
         
@@ -331,6 +337,15 @@ class Car():
         #self.tracers[5] = tracer_length * ((np.array(self.points[2]) + np.array(self.points[3]))/2 - self.center) / (self.length/2)               # backwards
         
         # calculate intersections and determine the closest intersection per tracer
+        for tracer in self.tracers:
+            self.tracer_points = [self.center + ((length/tracer_length) * tracer).astype(int) for length in range(tracer_length)]
+            for point in self.tracer_points:
+                if track.track_limits[int(point[1])][int(point[0])]:
+                    self.contact_tracers.append(point)
+                    break
+        
+        
+        """
         self.contact_tracers = []
         self.tracer_distances = []
         for tracer in self.tracers:
@@ -357,10 +372,15 @@ class Car():
             else:
                 self.contact_tracers.append(closest_intersection)
                 self.tracer_distances.append(closest_distance)
-
+        """
+        
         if show:
             for tracer in self.tracers:
                 pygame.draw.line(self.surface, color, self.center, self.center + tracer)
+            for contact_tracer in self.contact_tracers:
+                if contact_tracer is not None:
+                    pygame.draw.circle(self.surface, color, contact_tracer.astype(int), 4)
+            """
             if self.contact_tracers[0] is not None:
                 pygame.draw.circle(self.surface, color, self.contact_tracers[0].astype(int), 4)
             if self.contact_tracers[1] is not None:
@@ -373,7 +393,7 @@ class Car():
                 pygame.draw.circle(self.surface, color, self.contact_tracers[4].astype(int), 4)
             if self.contact_tracers[5] is not None:
                 pygame.draw.circle(self.surface, color, self.contact_tracers[5].astype(int), 4)
-    
+            """
     
     def autonomous_driving(self, parameter_sets):
         # include after sensor()
