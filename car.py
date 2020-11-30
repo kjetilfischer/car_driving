@@ -61,20 +61,6 @@ class Car():
         #    self.carmodel = pygame.transform.scale(self.carmodel, (self.width, self.length))
         #    self.carmodel = pygame.transform.rotate(self.carmodel, self.angle)
         
-        # path for intersection check`s
-        """
-        self.path1 = pltPath.Path(track.s1)
-        self.path2 = pltPath.Path(track.s2)
-        self.path3 = pltPath.Path(track.s3)
-        self.path4 = pltPath.Path(track.s4)
-        self.path5 = pltPath.Path(track.s5)
-        """
-        
-        """
-        self.pathsf = pltPath.Path(track.start_finish)
-        self.pathcp = pltPath.Path(track.checkpoint)
-        """
-        
         # states of the car
         self.turn_left = False
         self.turn_right = False
@@ -216,31 +202,9 @@ class Car():
             elif point[1] < 0 or point[1] > track.height:
                 crash = True
                 crash_bounds = True
-            # check for track limits
-            #elif point in track.track_limits:
-            #    crash = True
-            #    crash_bounds = False
             elif track.track_limits[point[1]][point[0]]:
                 crash = True
                 crash_bounds = True
-            
-            
-            
-            #elif self.path1.contains_points(self.points).any(): # no need for the for loop
-            #    crash = True
-            #    crash_bounds = False
-            #elif self.path2.contains_points(self.points).any():
-            #    crash = True
-            #    crash_bounds = False
-            #elif self.path3.contains_points(self.points).any():
-            #    crash = True
-            #    crash_bounds = False
-            #elif self.path4.contains_points(self.points).any():
-            #    crash = True
-            #    crash_bounds = False
-            #elif self.path5.contains_points(self.points).any():
-            #    crash = True
-            #    crash_bounds = False
             else:
                 crash = False
                 crash_bounds = False
@@ -279,7 +243,7 @@ class Car():
                 self.reset()
 
     
-    def calculate_intersection(self, L1, L2):
+    def calculate_intersection(self, L1, L2):    # not necessary for the code right now
         # calculates the intersection of two given lines in respect to the position vector and the length of the direction vector
         # returns point of intersection in respect to L1
         p1 = L1[0]  # position vector
@@ -308,13 +272,13 @@ class Car():
             Pxy = None
         return Pxy
     
-    def multidim_intersect(self, arr1, arr2):     # https://stackoverflow.com/questions/9269681/intersection-of-2d-numpy-ndarrays
+    def multidim_intersect(self, arr1, arr2):     # https://stackoverflow.com/questions/9269681/intersection-of-2d-numpy-ndarrays       # not necessary for the code right now
         arr1_view = arr1.view([('',arr1.dtype)]*arr1.shape[1])
         arr2_view = arr2.view([('',arr2.dtype)]*arr2.shape[1])
         intersected = np.intersect1d(arr1_view, arr2_view)
         return intersected.view(arr1.dtype).reshape(-1, arr1.shape[1])
     
-    def list_intersections(self, lst_1, lst_2):
+    def list_intersections(self, lst_1, lst_2):   # not necessary for the code right now
         intersections = [point for point in lst_1 if point in lst_2]
         return intersections
     
@@ -325,75 +289,22 @@ class Car():
         self.center = np.array((self.xpos, self.ypos))
         
         self.tracer_points = []
-        self.contact_tracers = []
+        self.intersections = []
         
-            
-        
-        #self.tracers[0] = tracer_length * ((np.array(self.points[0]) + np.array(self.points[1]))/2 - self.center) / (self.length/2)               # forward
-        #self.tracers[1] = tracer_length * (np.array(self.points[0]) - self.center) / sqrt(self.width*self.width + self.length*self.length) * 2    # forward/left
-        #self.tracers[2] = tracer_length * (np.array(self.points[1]) - self.center) / sqrt(self.width*self.width + self.length*self.length) * 2    # forwards/right
-        #self.tracers[3] = tracer_length * (np.array(self.points[2]) - self.center) / sqrt(self.width*self.width + self.length*self.length) * 2    # backwards/right
-        #self.tracers[4] = tracer_length * (np.array(self.points[3]) - self.center) / sqrt(self.width*self.width + self.length*self.length) * 2    # backwards/left
-        #self.tracers[5] = tracer_length * ((np.array(self.points[2]) + np.array(self.points[3]))/2 - self.center) / (self.length/2)               # backwards
-        
-        # calculate intersections and determine the closest intersection per tracer
+        # calculate intersections
         for tracer in self.tracers:
-            self.tracer_points = [self.center + ((length/tracer_length) * tracer).astype(int) for length in range(tracer_length)]
+            self.tracer_points = [self.center + (length/tracer_length * tracer) for length in range(tracer_length)]
             for point in self.tracer_points:
                 if track.track_limits[int(point[1])][int(point[0])]:
-                    self.contact_tracers.append(point)
+                    self.intersections.append(point)
                     break
-        
-        
-        """
-        self.contact_tracers = []
-        self.tracer_distances = []
-        for tracer in self.tracers:
-            self.tracer_points = np.array([self.center + ((length/tracer_length) * tracer).astype(int) for length in range(tracer_length)])
-            closest_distance = None
-            closest_intersection = None
-            #intersections = self.list_intersections(self.tracer_points, np.array(track.track_limits))
-            set_track_limits = set(track.track_limits)
-            intersections = self.multidim_intersect(self.tracer_points, np.array(track.track_limits))
-            if intersections is not []:
-                for intersection in intersections:
-                    distance = np.linalg.norm(intersection - self.center)               # intersections - self.center, since we are interested in the distance between the car and the intersection and not the origin and the intersection
-                    if closest_distance:
-                        if distance < closest_distance:
-                            closest_distance = distance
-                            closest_intersection = intersection
-                    else:
-                        closest_distance = distance
-                        closest_intersection = intersection 
-            #contacts.append(closest_intersection) 
-            if closest_intersection is None:
-                self.contact_tracers.append(None)
-                self.tracer_distances.append(None)                                      # important for autonomous_driving(), since the distance to impassable_lines is important not the location
-            else:
-                self.contact_tracers.append(closest_intersection)
-                self.tracer_distances.append(closest_distance)
-        """
         
         if show:
             for tracer in self.tracers:
                 pygame.draw.line(self.surface, color, self.center, self.center + tracer)
-            for contact_tracer in self.contact_tracers:
-                if contact_tracer is not None:
-                    pygame.draw.circle(self.surface, color, contact_tracer.astype(int), 4)
-            """
-            if self.contact_tracers[0] is not None:
-                pygame.draw.circle(self.surface, color, self.contact_tracers[0].astype(int), 4)
-            if self.contact_tracers[1] is not None:
-                pygame.draw.circle(self.surface, color, self.contact_tracers[1].astype(int), 4)
-            if self.contact_tracers[2] is not None:
-                pygame.draw.circle(self.surface, color, self.contact_tracers[2].astype(int), 4)
-            if self.contact_tracers[3] is not None:
-                pygame.draw.circle(self.surface, color, self.contact_tracers[3].astype(int), 4)
-            if self.contact_tracers[4] is not None:
-                pygame.draw.circle(self.surface, color, self.contact_tracers[4].astype(int), 4)
-            if self.contact_tracers[5] is not None:
-                pygame.draw.circle(self.surface, color, self.contact_tracers[5].astype(int), 4)
-            """
+            for intersection in self.intersections:
+                if intersection is not None:
+                    pygame.draw.circle(self.surface, color, intersection.astype(int), 4)
     
     def autonomous_driving(self, parameter_sets):
         # include after sensor()
