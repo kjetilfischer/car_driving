@@ -211,8 +211,8 @@ class Car():
             if crash:
                 break
         if crash:
-            self.velo = self.velo * (-1)
-            #self.vmax = self.vmax_static/10 * 0
+            #self.velo = self.velo * (-1)
+            self.vmax = self.vmax_static/10 * 0
             #self.xpos -= dt * 1.2 *(self.velo) * sin(self.angle) #not working yet
             #self.ypos -= dt * 1.2 *(self.velo) * cos(self.angle)
         else:

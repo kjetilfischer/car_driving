@@ -27,7 +27,7 @@ blue = (0, 0, 255)
 # draw the white background onto the surface
 windowSurface.fill(white)
 
-track = track.Track(windowSurface, window_width, window_height, green, black, white)
+track = track.Track("track1.png", windowSurface, window_width, window_height, green, black, white)
 
 car_1 = car.Car(windowSurface,
                 track,

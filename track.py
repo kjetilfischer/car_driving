@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.image as mpimg
 
 class Track:
-    def __init__(self, surface, window_width, window_height, color1, color2, color3):
+    def __init__(self, track_name, surface, window_width, window_height, color1, color2, color3):
         self.surface = surface
         self.width = window_width
         self.height = window_height
@@ -14,7 +14,7 @@ class Track:
         # START OF TRACK ANALYSIS
 
         # read image
-        self.img = mpimg.imread("track2.png")
+        self.img = mpimg.imread(track_name)
 
         # check for track size
         if len(self.img) != self.height or len(self.img[0]) != self.width:
