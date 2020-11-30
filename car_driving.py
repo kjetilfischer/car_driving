@@ -5,6 +5,7 @@ from math import sin, cos
 import time
 import car
 import track
+import numpy as np
  
 # set up pygame
 pygame.init()
@@ -80,8 +81,8 @@ while True:
     car_2.update(dt)
     car_1.draw()
     car_2.draw()
-    car_1.sensor(track, tracer_length=300, color=black, show=True)
-    car_2.sensor(track, tracer_length=300, color=black, show=True)
+    car_1.sensor(track, tracer_length=300, tracer_directions=[0, np.pi/4, -np.pi/4, np.pi/2, -np.pi/2, np.pi], color=black, show=True)
+    car_2.sensor(track, tracer_length=300, tracer_directions=[0, np.pi/4, -np.pi/4, np.pi/2, -np.pi/2, np.pi], color=black, show=True)
     car_1.check_crash(track, dt)
     car_2.check_crash(track, dt)
     car_1.check_checkpoint()

@@ -303,27 +303,45 @@ class Car():
             Pxy = None
         return Pxy
     
+    def multidim_intersect(self, arr1, arr2):     # https://stackoverflow.com/questions/9269681/intersection-of-2d-numpy-ndarrays
+        arr1_view = arr1.view([('',arr1.dtype)]*arr1.shape[1])
+        arr2_view = arr2.view([('',arr2.dtype)]*arr2.shape[1])
+        intersected = np.intersect1d(arr1_view, arr2_view)
+        return intersected.view(arr1.dtype).reshape(-1, arr1.shape[1])
     
-    def sensor(self, track, tracer_length=200, color=(0,0,0), show=False):   
-        self.tracers = [0] * 6
+    def list_intersections(self, lst_1, lst_2):
+        intersections = [point for point in lst_1 if point in lst_2]
+        return intersections
+    
+    
+    def sensor(self, track, tracer_length=200, tracer_directions=[0], color=(0,0,0), show=False):   
+        
+        self.tracers = np.array([(tracer_length * sin(self.angle + direction), tracer_length * (-cos(self.angle + direction))) for direction in tracer_directions])
         self.center = np.array((self.xpos, self.ypos))
-        self.tracers[0] = tracer_length * ((np.array(self.points[0]) + np.array(self.points[1]))/2 - self.center) / (self.length/2)               # forward
-        self.tracers[1] = tracer_length * (np.array(self.points[0]) - self.center) / sqrt(self.width*self.width + self.length*self.length) * 2    # forward/left
-        self.tracers[2] = tracer_length * (np.array(self.points[1]) - self.center) / sqrt(self.width*self.width + self.length*self.length) * 2    # forwards/right
-        self.tracers[3] = tracer_length * (np.array(self.points[2]) - self.center) / sqrt(self.width*self.width + self.length*self.length) * 2    # backwards/right
-        self.tracers[4] = tracer_length * (np.array(self.points[3]) - self.center) / sqrt(self.width*self.width + self.length*self.length) * 2    # backwards/left
-        self.tracers[5] = tracer_length * ((np.array(self.points[2]) + np.array(self.points[3]))/2 - self.center) / (self.length/2)               # backwards
+        
+        self.tracer_points = []
+        
+            
+        
+        #self.tracers[0] = tracer_length * ((np.array(self.points[0]) + np.array(self.points[1]))/2 - self.center) / (self.length/2)               # forward
+        #self.tracers[1] = tracer_length * (np.array(self.points[0]) - self.center) / sqrt(self.width*self.width + self.length*self.length) * 2    # forward/left
+        #self.tracers[2] = tracer_length * (np.array(self.points[1]) - self.center) / sqrt(self.width*self.width + self.length*self.length) * 2    # forwards/right
+        #self.tracers[3] = tracer_length * (np.array(self.points[2]) - self.center) / sqrt(self.width*self.width + self.length*self.length) * 2    # backwards/right
+        #self.tracers[4] = tracer_length * (np.array(self.points[3]) - self.center) / sqrt(self.width*self.width + self.length*self.length) * 2    # backwards/left
+        #self.tracers[5] = tracer_length * ((np.array(self.points[2]) + np.array(self.points[3]))/2 - self.center) / (self.length/2)               # backwards
         
         # calculate intersections and determine the closest intersection per tracer
         self.contact_tracers = []
         self.tracer_distances = []
         for tracer in self.tracers:
-            #contacts = []
+            self.tracer_points = np.array([self.center + ((length/tracer_length) * tracer).astype(int) for length in range(tracer_length)])
             closest_distance = None
             closest_intersection = None
-            for line in track.impassable_lines:
-                intersection = self.calculate_intersection((self.center, tracer), line)
-                if intersection is not None:
+            #intersections = self.list_intersections(self.tracer_points, np.array(track.track_limits))
+            set_track_limits = set(track.track_limits)
+            intersections = self.multidim_intersect(self.tracer_points, np.array(track.track_limits))
+            if intersections is not []:
+                for intersection in intersections:
                     distance = np.linalg.norm(intersection - self.center)               # intersections - self.center, since we are interested in the distance between the car and the intersection and not the origin and the intersection
                     if closest_distance:
                         if distance < closest_distance:
@@ -332,12 +350,12 @@ class Car():
                     else:
                         closest_distance = distance
                         closest_intersection = intersection 
-                #contacts.append(closest_intersection) 
+            #contacts.append(closest_intersection) 
             if closest_intersection is None:
                 self.contact_tracers.append(None)
                 self.tracer_distances.append(None)                                      # important for autonomous_driving(), since the distance to impassable_lines is important not the location
             else:
-                self.contact_tracers.append(np.array(closest_intersection))
+                self.contact_tracers.append(closest_intersection)
                 self.tracer_distances.append(closest_distance)
 
         if show:

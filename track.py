@@ -66,7 +66,7 @@ class Track:
         # START OF TRACK ANALYSIS
 
         # read image
-        self.img = mpimg.imread("track3.png")
+        self.img = mpimg.imread("track2.png")
 
         # check for track size
         if len(self.img) != self.height or len(self.img[0]) != self.width:
