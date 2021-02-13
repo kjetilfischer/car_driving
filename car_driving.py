@@ -29,22 +29,23 @@ windowSurface.fill(white)
 
 track = track.Track("track1.png", windowSurface, window_width, window_height, green, black, white)
 
-car_1 = car.Car(windowSurface,
-                track,
-                xpos=track.startp1[0],
-                ypos=track.startp1[1],
-                width=20,
-                length=40,
-                angle=0,
-                vmax=0.25,
-                acc=0.00025,
-                carmodel="redcar.png",
-                color=red,
-                drift_factor=1,
-                left="K_a",
-                right="K_d",
-                up="K_w",
-                down="K_s")
+
+#car_1 = car.Car(windowSurface,
+#                track,
+#                xpos=track.startp1[0],
+#                ypos=track.startp1[1],
+#                width=20,
+#                length=40,
+#                angle=0,
+#                vmax=0.25,
+#                acc=0.00025,
+#                carmodel="redcar.png",
+#                color=red,
+#                drift_factor=1,
+#                left="K_a",
+#                right="K_d",
+#                up="K_w",
+#                down="K_s")
 
 car_2 = car.Car(windowSurface,
                 track,
@@ -53,7 +54,7 @@ car_2 = car.Car(windowSurface,
                 width=20,
                 length=40,
                 angle=0,
-                vmax=0.25,
+                vmax=0.1,
                 acc=0.00025,
                 carmodel="bluecar.png",
                 color=blue,
@@ -77,32 +78,32 @@ while True:
     dt = clock.tick(60)
     windowSurface.fill(white)
     track.draw(current_time1, current_time2, lap_time1, lap_time2)
-    car_1.update(dt)
+#    car_1.update(dt)
     car_2.update(dt)
-    car_1.draw()
+#    car_1.draw()
     car_2.draw()
-    car_1.sensor(track, tracer_length=300, tracer_directions=[0, np.pi/4, -np.pi/4, np.pi/2, -np.pi/2, np.pi], color=black, show=True)
+#    car_1.sensor(track, tracer_length=300, tracer_directions=[0, np.pi/4, -np.pi/4, np.pi/2, -np.pi/2, np.pi], color=black, show=True)
     car_2.sensor(track, tracer_length=300, tracer_directions=[0, np.pi/4, -np.pi/4, np.pi/2, -np.pi/2, np.pi], color=black, show=True)
-    car_1.check_crash(track, dt)
+#    car_1.check_crash(track, dt)
     car_2.check_crash(track, dt)
-    car_1.check_checkpoint()
+#    car_1.check_checkpoint()
     car_2.check_checkpoint()
-    if car_1.finish:
-        lap_time1 = current_time1
-        time_start1 = time.time()
-        car_1.finish = False
+#    if car_1.finish:
+#        lap_time1 = current_time1
+#        time_start1 = time.time()
+#        car_1.finish = False
     if car_2.finish:
         lap_time2 = current_time2
         time_start2 = time.time()
         car_2.finish = False
     
     for event in pygame.event.get():
-        car_1.controls(event)
+#        car_1.controls(event)
         car_2.controls(event)
         
         if event.type == pygame.KEYDOWN:
             if event.key == K_ESCAPE:
-                car_1.reset()
+#                car_1.reset()
                 car_2.reset()
                 time_start = time.time()
                 lap_time1 = ""

@@ -50,6 +50,7 @@ class Car():
         self.vmax = self.vmax_static
         self.angle = self.angle_start
         self.old_angles = [0]
+        self.old_points = [(xpos, ypos)] * 4
         self.drift_counter = 0
         self.xpos = self.xpos_start
         self.ypos = self.ypos_start
@@ -193,7 +194,72 @@ class Car():
                     break
     
     
+    def line(self, x0, y0, x1, y1): # Bresenhams line algorithm as a generator # https://stackoverflow.com/questions/47704008/fastest-way-to-get-all-the-points-between-two-x-y-coordinates-in-python # https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm#All_cases
+        deltax = x1-x0
+        if deltax == 0:
+            deltax = 0.1    # avoiding division by zero (ugly but working)
+        dxsign = int(abs(deltax)/deltax)
+        deltay = y1-y0
+        if deltay == 0:
+            deltay = 0.1    # avoiding division by zero (ugly but working)
+        dysign = int(abs(deltay)/deltay)
+        deltaerr_y = abs(deltay/deltax)
+        deltaerr_x = abs(deltax/deltay)
+        error = 0
+        if deltaerr_x >= deltaerr_y:
+            y = y0
+            for x in range(x0, x1, dxsign):
+                yield x, y
+                error = error + deltaerr_y
+                while error >= 0.5:
+                    y += dysign
+                    error -= 1
+        if deltaerr_y > deltaerr_x:
+            x = x0
+            for y in range(y0, y1, dysign):
+                yield x, y
+                error = error + deltaerr_x
+                while error >= 0.5:
+                    x += dxsign
+                    error -= 1
+        yield x1, y1
+    
     def check_crash(self, track, dt):
+        #"""
+        # THIS IS NOT WORKING PROPERLY
+        for point, old_point in zip(self.points, self.old_points):
+            delta_points = self.line(old_point[0], old_point[1], point[0], point[1])
+            for delta_point in delta_points:
+                print(f"rpoint: {point}")
+                print(f"dpoint: {delta_point}")
+                # check for window boundaries first
+                if delta_point[0] < 0 or delta_point[0] > track.width:
+                    crash = True
+                    crash_bounds = True
+                elif delta_point[1] < 0 or delta_point[1] > track.height:
+                    crash = True
+                    crash_bounds = True
+                # check for track boundaries
+                elif track.track_limits[delta_point[1]][delta_point[0]]:    # [row][column] == [y][x]
+                    crash = True
+                    crash_bounds = True
+                    print("crash detected")
+                    print(point)
+                    print(delta_point)
+                else:
+                    crash = False
+                    crash_bounds = False
+                if crash:
+                    break
+            if crash:
+                self.velo = self.velo * (-1)
+                #self.vmax = self.vmax_static/10 * 0
+                #self.xpos -= dt * 1.2 *(self.velo) * sin(self.angle) #not working yet
+                #self.ypos -= dt * 1.2 *(self.velo) * cos(self.angle)
+                break
+            else:
+                self.vmax = self.vmax_static
+        """
         for point in self.points:
             # check for window boundaries first
             if point[0] < 0 or point[0] > track.width:
@@ -202,21 +268,25 @@ class Car():
             elif point[1] < 0 or point[1] > track.height:
                 crash = True
                 crash_bounds = True
-            elif track.track_limits[point[1]][point[0]]:
+            # check for track boundaries
+            elif track.track_limits[point[1]][point[0]]:    # [row][column] == [y][x]
                 crash = True
                 crash_bounds = True
+                print(point)
             else:
                 crash = False
                 crash_bounds = False
             if crash:
                 break
         if crash:
-            #self.velo = self.velo * (-1)
-            self.vmax = self.vmax_static/10 * 0
+            self.velo = self.velo * (-1)
+            #self.vmax = self.vmax_static/10 * 0
             #self.xpos -= dt * 1.2 *(self.velo) * sin(self.angle) #not working yet
             #self.ypos -= dt * 1.2 *(self.velo) * cos(self.angle)
         else:
             self.vmax = self.vmax_static
+        """
+        
         if crash_bounds:
             out_of_bounds_x_left = []
             out_of_bounds_x_right = []
@@ -241,6 +311,7 @@ class Car():
                     out_of_bounds_y_bot.append(False)
             if all(out_of_bounds_x_left) or all(out_of_bounds_x_right) or all(out_of_bounds_y_top) or all(out_of_bounds_y_bot):
                 self.reset()
+            self.old_points = self.points
 
     
     def calculate_intersection(self, L1, L2):    # not necessary for the code right now
@@ -306,6 +377,7 @@ class Car():
                 if intersection is not None:
                     pygame.draw.circle(self.surface, color, intersection.astype(int), 4)
     
+    # work in progress...
     def autonomous_driving(self, parameter_sets):
         # include after sensor()
         # decision criteria:

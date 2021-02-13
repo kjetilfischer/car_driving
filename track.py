@@ -11,7 +11,7 @@ class Track:
         self.color2 = color2
         self.color3 = color3
         
-        # START OF TRACK ANALYSIS
+        # START OF TRACK ANALYSIS ------------------------------------------------------------------------------
 
         # read image
         self.img = mpimg.imread(track_name)
@@ -26,7 +26,7 @@ class Track:
         self.checkpoint = []
         for row in range(len(self.img)):
             for column in range(len(self.img[0])):
-                if (self.img[row][column][:3] == [0, 0, 0]).all():
+                if (self.img[row][column][:3] == [0, 0, 0]).all():      # find black pixels as track_limits
                     self.track_limits[row][column] = 1
                 if (self.img[row][column][:3] == [1, 0, 0]).all():      # find markers
                     self.startp1 = (column, row)
@@ -50,7 +50,7 @@ class Track:
                     self.img[row][column][2] = 1
         mpimg.imsave("tmp_track.png", self.img)
         
-        # END OF TRACK ANALYSIS
+        # END OF TRACK ANALYSIS -------------------------------------------------------------------------------
         
         # read image for pygame
         self.pyimg = pygame.image.load("tmp_track.png")
